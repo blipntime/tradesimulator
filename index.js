@@ -52,12 +52,13 @@ const invest = () => {
 }
 
 const trade = () => {
+  tradeCount++
   taxPaid = 0
   const startingTradeBalance = tradeBalance
   lastGain = randomGain(startingTradeBalance)
   tradeBalance = tradeBalance * (1 + lastGain)
   const lastDiff = tradeBalance - startingTradeBalance
-  console.log(`Traded ${startingTradeBalance} -> ${tradeBalance}`.cyan, `+${lastDiff}`.green, `${tradeBalance / startingTradeBalance * 100 - 100}%`.cyan)
+  console.log(`${tradeCount}. Traded ${startingTradeBalance} -> ${tradeBalance}`.cyan, `+${lastDiff}`.green, `${tradeBalance / startingTradeBalance * 100 - 100}%`.cyan)
 }
 
 const settle = () => {
@@ -101,12 +102,10 @@ while (walletBalance + tradeBalance < 400000) {
 
   trade()
 
-  if (tradeCount % 2 === 1) {
+  if (tradeCount % 2 === 0) {
     settle() // every other time
     printStatus()
   }
-
-  tradeCount++
 }
 
 if (taxPaid === 0) {
@@ -114,4 +113,4 @@ if (taxPaid === 0) {
   printStatus()
 }
 
-console.log(`Total`, `${walletBalance + tradeBalance}`.green, `${tradeCount} trades. Total tax `, `${totalTax}`.red)
+console.log(`Total`, `${walletBalance + tradeBalance}`.green, `Total tax `, `${totalTax}`.red)
