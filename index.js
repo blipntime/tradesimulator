@@ -97,6 +97,7 @@ while (walletBalance + tradeBalance < 400000) {
 
 if (taxPaid === 0) {
   settle()
+  printStatus()
 }
 
 console.log(`Total`, `${walletBalance + tradeBalance}`.green, `${tradeCount} trades. Total tax `, `${totalTax}`.red)
