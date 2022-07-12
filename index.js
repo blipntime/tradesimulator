@@ -5,14 +5,20 @@ require('colors')
 
 // initial investment!
 // all subsequent investment will be from gains
-let walletBalance = 1000 
+let walletBalance = 1200 
 let tradeBalance = 0
 
 let totalTax = 0
-const GAINS = [.3, .5, .6]
+const GAINS = [.4, .5, .6, .7] // .5=20K, .6=50K, .7=100K
 const NO_REINVEST_RATIO = .6
 
-const randomGain = () => GAINS[Math.floor(Math.random() * 3)]
+const randomGain = availableAmt => {
+  let range = availableAmt < 20000 ? 1 :
+    availableAmt < 50000 ? 2 :
+    availableAmt < 100000 ? 3 :
+    4
+  return GAINS[Math.floor(Math.random() * range)]
+}
 
 const calcTaxRate = gain => {
   if (gain < 100000) {
@@ -48,7 +54,7 @@ const invest = () => {
 const trade = () => {
   taxPaid = 0
   const startingTradeBalance = tradeBalance
-  lastGain = randomGain()
+  lastGain = randomGain(startingTradeBalance)
   tradeBalance = tradeBalance * (1 + lastGain)
   const lastDiff = tradeBalance - startingTradeBalance
   console.log(`Traded ${startingTradeBalance} -> ${tradeBalance} = ${lastDiff} ${tradeBalance / startingTradeBalance * 100 - 100}%`.cyan)
