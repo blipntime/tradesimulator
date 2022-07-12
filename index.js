@@ -64,7 +64,10 @@ const settle = () => {
   walletBalance -= taxPaid
   totalTax += taxPaid
   // move out part of profit to wallet
-  const moveOut = diff * NO_REINVEST_RATIO
+  let moveOut = diff * NO_REINVEST_RATIO
+  if (tradeBalance - moveOut > 170000) {
+    moveOut = tradeBalance - 170000 // never go above 170000
+  }
   walletBalance += moveOut
   tradeBalance -= moveOut
   lastTradeBalanceSettled = tradeBalance
@@ -72,7 +75,7 @@ const settle = () => {
 }
 
 const printStatus = () => 
-  console.log(`wallet: `, `${walletBalance}`.green, `tradeBalance ${tradeBalance} \n\n`.green)
+  console.log(`wallet: `, `${walletBalance}`.green, `tradeBalance: `, `${tradeBalance}\n\n`.green)
 
 printStatus()
 
