@@ -5,14 +5,36 @@ require('colors')
 
 // initial investment!
 // all subsequent investment will be from gains
-let walletBalance = 10000 
+let walletBalance = 1000 
 let tradeBalance = 0
 
 let totalTax = 0
-
-const GAIN = 0.3
-const TAX = 0.3
+const GAINS = [.3, .5, .6]
 const NO_REINVEST_RATIO = .6
+
+const randomGain = () => GAINS[Math.floor(Math.random() * 3)]
+
+const calcTaxRate = gain => {
+  if (gain < 100000) {
+    return .15
+  } else if (gain < 500000) {
+    return .2
+  }
+  return .35
+}
+
+let lastGain
+let taxPaid 
+let lastTradeBalanceSettled 
+let premiumPaid = 0
+
+const upgradeToPremium = () => {
+  if (tradeBalance > 100000 && premiumPaid === 0) {
+    premiumPaid = tradeBalance * .05
+    walletBalance -= premiumPaid
+    console.log(`Upgraded to premium `, `-${premiumPaid}`.red)
+  }
+}
 
 // always invest half
 // deduct transfer cost 50 USDT later
@@ -20,29 +42,37 @@ const invest = () => {
   const toInvest = walletBalance / 2 // initial investment ratio
   walletBalance -= toInvest
   tradeBalance += toInvest
+  lastTradeBalanceSettled = tradeBalance
 }
 
-// 30% for now
 const trade = () => {
-  const oldTradeBalance = tradeBalance
-  tradeBalance = tradeBalance * (1 + GAIN)
-  console.log(`Traded ${oldTradeBalance} -> ${tradeBalance} ${tradeBalance / oldTradeBalance * 100 - 100}%`.cyan)
+  taxPaid = 0
+  const startingTradeBalance = tradeBalance
+  lastGain = randomGain()
+  tradeBalance = tradeBalance * (1 + lastGain)
+  const lastDiff = tradeBalance - startingTradeBalance
+  console.log(`Traded ${startingTradeBalance} -> ${tradeBalance} = ${lastDiff} ${tradeBalance / startingTradeBalance * 100 - 100}%`.cyan)
 }
 
 const settle = () => {
+  const diff = tradeBalance - lastTradeBalanceSettled
   // send tax on gain to exhange
-  const taxPaid = tradeBalance / (1 + GAIN) * GAIN * TAX
-  console.log(`${TAX*100}% Tax paid ${taxPaid}`.red)
+  const taxRate = calcTaxRate(diff)
+  taxPaid = diff * taxRate
+  console.log(`${taxRate * 100}% Tax paid`, `-${taxPaid}`.red)
+  
   walletBalance -= taxPaid
   totalTax += taxPaid
   // move out part of profit to wallet
-  const moveOut = tradeBalance / (1 + GAIN) * (GAIN * NO_REINVEST_RATIO)
+  const moveOut = diff * NO_REINVEST_RATIO
   walletBalance += moveOut
   tradeBalance -= moveOut
+  lastTradeBalanceSettled = tradeBalance
+  upgradeToPremium()
 }
 
 const printStatus = () => 
-  console.log(`wallet ${walletBalance}      tradeBalance ${tradeBalance} \n\n`.green)
+  console.log(`wallet: `, `${walletBalance}`.green, `tradeBalance ${tradeBalance} \n\n`.green)
 
 printStatus()
 
@@ -50,15 +80,20 @@ invest()
 
 let tradeCount = 0
 
-while (walletBalance + tradeBalance < 100000) {
+while (walletBalance + tradeBalance < 400000) {
 
   trade()
 
-  settle()
-
-  printStatus()
+  if (tradeCount % 2 === 1) {
+    settle() // every other time
+    printStatus()
+  }
 
   tradeCount++
 }
 
-console.log(`Total ${walletBalance + tradeBalance}`.green, tradeCount, 'trades.', ` Total tax ${totalTax}`.red)
+if (taxPaid === 0) {
+  settle()
+}
+
+console.log(`Total`, `${walletBalance + tradeBalance}`.green, `${tradeCount} trades. Total tax `, `${totalTax}`.red)
