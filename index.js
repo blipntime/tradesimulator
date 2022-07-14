@@ -10,7 +10,7 @@ let tradeBalance = 0
 
 let totalTax = 0
 const GAINS = [.4, .5, .6, .7] // .5=20K, .6=50K, .7=100K
-const NO_REINVEST_RATIO = .6
+const NO_REINVEST_RATIO = .55
 
 const randomGain = availableAmt => {
   let range = availableAmt < 20000 ? 1 :
@@ -26,7 +26,7 @@ const calcTaxRate = gain => {
   } else if (gain < 500000) {
     return .2
   }
-  return .35
+  return .25
 }
 
 let lastGain
@@ -88,7 +88,7 @@ const settle = () => {
 }
 
 const printStatus = () => 
-  console.log(`wallet: `, `${walletBalance}`.green, ` tradeBalance: `, `${tradeBalance}\n\n`.green)
+  console.log(`wallet:`, `${walletBalance}`.green, ` tradeBalance:`, `${tradeBalance}`.green, `total:`, `${walletBalance + tradeBalance}`.green, `\n\n`)
 
 printStatus()
 
