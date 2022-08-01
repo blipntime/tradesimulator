@@ -21,7 +21,9 @@ const randomGain = availableAmt => {
 }
 
 const calcTaxRate = gain => {
-  if (gain < 100000) {
+  if (gain < 9000) {
+    return 0
+  } else if (gain < 100000) {
     return .15
   } else if (gain < 500000) {
     return .2
@@ -29,7 +31,6 @@ const calcTaxRate = gain => {
   return .25
 }
 
-let lastGain
 let taxPaid 
 let lastTradeBalanceSettled 
 let premiumPaid = 0
@@ -46,8 +47,8 @@ const upgradeToPremium = () => {
 // deduct transfer cost 50 USDT later
 const invest = () => {
   const toInvest = walletBalance / 2 // initial investment ratio
-  walletBalance -= toInvest
-  tradeBalance += toInvest
+  walletBalance = 900// -= toInvest
+  tradeBalance = 1050 // += toInvest
   lastTradeBalanceSettled = tradeBalance
 }
 
@@ -55,7 +56,7 @@ const trade = () => {
   tradeCount++
   taxPaid = 0
   const startingTradeBalance = tradeBalance
-  lastGain = randomGain(startingTradeBalance)
+  let lastGain = randomGain(startingTradeBalance)
   tradeBalance = tradeBalance * (1 + lastGain)
   const lastDiff = tradeBalance - startingTradeBalance
   console.log(`${tradeCount}. Traded ${startingTradeBalance} -> ${tradeBalance}`.cyan, `+${lastDiff}`.green, `${tradeBalance / startingTradeBalance * 100 - 100}%`.cyan)
