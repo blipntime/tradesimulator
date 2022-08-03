@@ -46,8 +46,7 @@ const upgradeToPremium = () => {
 // always invest half
 // deduct transfer cost 50 USDT later
 const invest = () => {
-  const toInvest = walletBalance / 2 // initial investment ratio
-  walletBalance = 900// -= toInvest
+  walletBalance = 334 // -= toInvest
   tradeBalance = 1050 // += toInvest
   lastTradeBalanceSettled = tradeBalance
 }
@@ -71,7 +70,7 @@ const settle = () => {
   walletBalance -= taxPaid
   totalTax += taxPaid
 
-  console.log(`${taxRate * 100}% Tax paid`, `-${taxPaid}`.red)
+  console.log(`${taxRate * 100}% Tax paid`, `${taxPaid ? ('-'+taxPaid) : 'NOTHING'}`.red)
   
   // move out part of profit to wallet
   let moveOut = diff * NO_REINVEST_RATIO
