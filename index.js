@@ -9,7 +9,7 @@ let walletBalance = 1200
 let tradeBalance = 0
 
 let totalTax = 0
-const GAINS = [.4, .5, .6, .7] // .5=20K, .6=50K, .7=100K
+const GAINS = [.4, .5, .6, .7] // .4=0 .5=20K, .6=50K, .7=100K
 const NO_REINVEST_RATIO = .55
 
 const randomGain = availableAmt => {
@@ -21,7 +21,7 @@ const randomGain = availableAmt => {
 }
 
 const calcTaxRate = gain => {
-  if (gain < 9000) {
+  if (gain < 10000) {
     return 0
   } else if (gain < 100000) {
     return .15
@@ -34,9 +34,11 @@ const calcTaxRate = gain => {
 let taxPaid 
 let lastTradeBalanceSettled 
 let premiumPaid = 0
+let cashOut = 0
+let totalCashout = 0
 
 const upgradeToPremium = () => {
-  if (tradeBalance > 100000 && premiumPaid === 0) {
+  if (tradeBalance > 10000 && premiumPaid === 0) {
     premiumPaid = tradeBalance * .05
     walletBalance -= premiumPaid
     console.log(`Upgraded to premium `, `-${premiumPaid}`.red)
@@ -44,10 +46,9 @@ const upgradeToPremium = () => {
 }
 
 // always invest half
-// deduct transfer cost 50 USDT later
 const invest = () => {
-  walletBalance = 334 // -= toInvest
-  tradeBalance = 1050 // += toInvest
+  walletBalance = 870
+  tradeBalance = 1430
   lastTradeBalanceSettled = tradeBalance
 }
 
@@ -77,18 +78,24 @@ const settle = () => {
   if (tradeBalance - moveOut > 170000) {
     moveOut = tradeBalance - 170000 // never go above 170000
   }
+  moveOut *= .99
+  console.log(`Moved to wallet`, `${moveOut}`.green)
+
   walletBalance += moveOut
   tradeBalance -= moveOut
-  
-  console.log(`Moved to wallet`, `${moveOut}`.green)
+  cashOut = walletBalance - tradeBalance / 2
+  totalCashout += cashOut
+  walletBalance -= cashOut
   
   lastTradeBalanceSettled = tradeBalance
   
   upgradeToPremium()
 }
 
-const printStatus = () => 
-  console.log(`wallet:`, `${walletBalance}`.green, ` tradeBalance:`, `${tradeBalance}`.green, `total:`, `${walletBalance + tradeBalance}`.green, `\n\n`)
+const printStatus = () => {
+  console.log(`Trade:`, `${tradeBalance}`.green, `Cash out:`, `${cashOut}`.green, `Wallet:`, `${walletBalance}`.green,
+   `\n\n`)
+}
 
 printStatus()
 
@@ -98,8 +105,7 @@ printStatus()
 
 let tradeCount = 0
 
-while (walletBalance + tradeBalance < 400000) {
-
+while (walletBalance + tradeBalance + totalCashout < 415000) { //while (totalCashout < 350000) {
   trade()
 
   if (tradeCount % 2 === 0) {
@@ -113,4 +119,5 @@ if (taxPaid === 0) {
   printStatus()
 }
 
-console.log(`Total`, `${walletBalance + tradeBalance}`.green, `Total tax `, `${totalTax}`.red)
+console.log(`Total`, `${walletBalance + tradeBalance + totalCashout}`.green, `Total tax `, `${totalTax}`.red)
+console.log(`Total Cash out`, `${totalCashout}`.green)
