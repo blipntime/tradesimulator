@@ -3,9 +3,7 @@
 
 require('colors')
 
-// initial investment!
-// all subsequent investment will be from gains
-let walletBalance = 1200 
+let walletBalance = 0 
 let tradeBalance = 0
 
 let totalTax = 0
@@ -47,7 +45,7 @@ const upgradeToPremium = () => {
 
 // always invest half
 const invest = () => {
-  walletBalance = 870
+  walletBalance = 886
   tradeBalance = 1430
   lastTradeBalanceSettled = tradeBalance
 }
@@ -78,12 +76,12 @@ const settle = () => {
   if (tradeBalance - moveOut > 170000) {
     moveOut = tradeBalance - 170000 // never go above 170000
   }
-  moveOut *= .99
+  moveOut *= .99 // 1% sending fee
   console.log(`Moved to wallet`, `${moveOut}`.green)
 
   walletBalance += moveOut
   tradeBalance -= moveOut
-  cashOut = walletBalance - tradeBalance / 2
+  cashOut = Math.max(walletBalance - tradeBalance / 2, 0)
   totalCashout += cashOut
   walletBalance -= cashOut
   
@@ -93,11 +91,10 @@ const settle = () => {
 }
 
 const printStatus = () => {
-  console.log(`Trade:`, `${tradeBalance}`.green, `Cash out:`, `${cashOut}`.green, `Wallet:`, `${walletBalance}`.green,
-   `\n\n`)
+  const ratio = walletBalance / tradeBalance * 100
+  console.log(`Trade:`, `${tradeBalance}`.green, `Cash out:`, `${cashOut}`.green, `Wallet:`, `${walletBalance}`.green, 
+    ratio < 40 ? `Wallet to Trade Ratio Low! ${ratio}%`.red : ``, `\n\n`)
 }
-
-printStatus()
 
 invest()
 
