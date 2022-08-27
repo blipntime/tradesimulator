@@ -67,16 +67,16 @@ const settle = lastProfit => {
   let taxRate = 0
 
   if (profitToSettle > 9999) {
-    console.log(`+${profitToSettle}`.green)
     // send tax on gain to exhange
     taxRate = calcTaxRate(profitToSettle)
     taxPaid = profitToSettle * taxRate
     walletBalance -= taxPaid
     totalTax += taxPaid
+    console.log(`+${profitToSettle}`.green, `${taxRate * 100}% Tax paid`, `${'-'+taxPaid}`.red)
     profitToSettle = 0
+  } else {
+    console.log(`+${profitToSettle}`.green, 'NO TAX'.red)
   }
-
-  console.log(`${taxRate * 100}% Tax paid`, `${taxPaid ? ('-'+taxPaid) : 'NOTHING'}`.red)
   
   // move out part of profit to wallet
   let moveOut = lastProfit * NO_REINVEST_RATIO
@@ -97,7 +97,7 @@ const settle = lastProfit => {
 
 const printStatus = () => {
   const ratio = walletBalance / tradeBalance
-  console.log(`Trade:`, `${tradeBalance}`.green, `Cash out:`, `${cashOut}`.green, `Wallet:`, `${walletBalance}`.green, 
+  console.log(`Trade:`, `${tradeBalance}`.green, `Cash out:`, `${cashOut.toFixed()}/${totalCashout.toFixed()}`.green, `Wallet:`, `${walletBalance}`.green, 
     ratio < RESERVE_RATIO ? `Wallet to Trade Ratio Low! ${ratio * 100}%`.red : ``, `\n\n`)
 }
 
@@ -119,5 +119,5 @@ if (profitToSettle > 0) {
   printStatus()
 }
 
-console.log(`Total`, `${walletBalance + tradeBalance + totalCashout}`.green, `Total tax `, `${totalTax}`.red)
+console.log(`Total`, `${walletBalance + tradeBalance + totalCashout}`.green, `Total tax `, `${totalTax.toFixed()}`.red)
 console.log(`Total Cash out`, `${totalCashout}`.green)
