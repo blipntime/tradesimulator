@@ -30,7 +30,7 @@ const calcTaxRate = gain => {
   return .25
 }
 
-let profitToSettle = 0
+let profitToSettle = 1400
 let premiumPaid = 0
 let cashOut = 0
 let totalCashout = 0
@@ -43,10 +43,9 @@ const upgradeToPremium = () => {
   }
 }
 
-// always invest half
 const invest = () => {
-  walletBalance = 0
-  tradeBalance = 4000
+  walletBalance = 1441 
+  tradeBalance = 2860 
 }
 
 const trade = () => {
@@ -83,11 +82,10 @@ const settle = lastProfit => {
   if (tradeBalance - moveOut > 170000) {
     moveOut = tradeBalance - 170000 // never go above 170000
   }
-  moveOut *= .99 // 1% sending fee
-  console.log(`Moved to wallet`, `${moveOut}`.green)
-
-  walletBalance += moveOut
   tradeBalance -= moveOut
+  walletBalance += moveOut * .99 // 1% sending fee
+  console.log(`Moved to wallet`, `${moveOut * .99}`.green)
+  
   cashOut = Math.max(walletBalance - tradeBalance * RESERVE_RATIO, 0)
   totalCashout += cashOut
   walletBalance -= cashOut
@@ -98,7 +96,7 @@ const settle = lastProfit => {
 const printStatus = () => {
   const ratio = walletBalance / tradeBalance
   console.log(`Trade:`, `${tradeBalance}`.green, `Cash out:`, `${cashOut.toFixed()}/${totalCashout.toFixed()}`.green, `Wallet:`, `${walletBalance}`.green, 
-    ratio < RESERVE_RATIO ? `Wallet to Trade Ratio Low! ${ratio * 100}%`.red : ``, `\n\n`)
+    ratio.toFixed(2) < RESERVE_RATIO ? `Wallet to Trade Ratio Low! ${ratio * 100}%`.red : ``, `\n\n`)
 }
 
 invest()
